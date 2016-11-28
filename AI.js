@@ -25,13 +25,8 @@ function AI(board, workingPiece, nextPiece) {
    this.board = board;
    this.workingPiece = workingPiece;
    this.nextPiece = nextPiece;
-   this.weights =
-      // [-0.4183235006979693, -0.1374482895381881, 0.8110677791418301, -0.44896693144114197]; // super
-      // [-0.9699411317621118, -0.11608888863398259, 0.951499783994008, -0.4320928025669635]; // super
-      // [-0.12054900882437947, -0.01205939721265481, 0.27217085668470076, -0.8499379021310605];
-      [-0.8678748619943022, -0.15159847061896436, 0.7986003651790572, -0.8744548750886376]; //good
+   this.weights = [-0.9699411317621118, -0.11608888863398259, 0.951499783994008, -0.4320928025669635];
 }
-
 /**
  * This method calculates the best move based on the current board and the current working piece.
  * and returns the best translation and rotation of the piece.
@@ -73,7 +68,7 @@ AI.prototype.getMove = function () {
       _workingPiece.rotate('CW');
    }
    this.moved = true;
-   return ({ col: this.bestCol, rotation: this.bestRotation });
+   return ({ col: this.bestCol, rotation: this.bestRotation })
 }
 
 /**
