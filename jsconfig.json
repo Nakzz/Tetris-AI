@@ -1,0 +1,12 @@
+{
+    "compilerOptions": {
+        "target": "ES6"
+    },
+    "files": [
+        "AI.js",
+        "Board.js",
+        "GameManager.js",
+        "Piece.js",
+        "WeightLearner.js"
+    ]
+}
