@@ -27,6 +27,7 @@ function AI(board, workingPiece, nextPiece) {
    this.nextPiece = nextPiece;
    this.weights = [-0.9699411317621118, -0.11608888863398259, 0.951499783994008, -0.4320928025669635];
 }
+
 /**
  * This method calculates the best move based on the current board and the current working piece.
  * and returns the best translation and rotation of the piece.
@@ -42,6 +43,7 @@ AI.prototype.getMove = function () {
       while (this.board.moveAllowed(_workingPiece, LEFT)) {
          _workingPiece.col--;
       }
+      
       // test the piece at all locations along the bottom
       for (var _col = 0; _col < COLS - _workingPiece.matrix.length + 2; _col++) {
          var _board = this.board.duplicate();
@@ -49,16 +51,21 @@ AI.prototype.getMove = function () {
          while (_board.moveAllowed(_workingPiece, DOWN)) {
             _workingPiece.row++;
          }
+
          _board.addPiece(_workingPiece);
          var _SBE = this.calculateSBE(_board);
          _board.clearFilledRows();
+
          // _SBE += this.moveHelper(_board.duplicate());
+
          if (_SBE > this.bestSBE) {
             this.bestSBE = _SBE;
             this.bestRotation = _workingPiece.rotation;
             this.bestCol = _workingPiece.col;
          }
+
          _workingPiece.row = 0;
+
          if (_board.moveAllowed(_workingPiece, RIGHT)) {
             _workingPiece.col++;
          } else {
@@ -67,9 +74,11 @@ AI.prototype.getMove = function () {
       }
       _workingPiece.rotate('CW');
    }
+
    this.moved = true;
+
    return ({ col: this.bestCol, rotation: this.bestRotation })
-}
+};
 
 /**
  * This method calculates the best move based on the current board and the next piece.
@@ -79,35 +88,45 @@ AI.prototype.getMove = function () {
 AI.prototype.moveHelper = function (board) {
    var _bestSBE = -Infinity;
    var _workingPiece = this.nextPiece.duplicate();
+
    // test each rotation
    for (var _rotation = 0; _rotation < _workingPiece.matrices.length; _rotation++, _workingPiece.col = 0, _workingPiece.row = 0) {
+
       // shift piece as far left as possible
       while (board.moveAllowed(_workingPiece, LEFT)) {
          _workingPiece.col--;
       }
+
       // test the piece at all locations along the bottom
       for (var _col = 0; _col < COLS - _workingPiece.matrix.length + 2; _col++) {
          var _board = board.duplicate();
+
          while (_board.moveAllowed(_workingPiece, DOWN)) {
             _workingPiece.row++;
          }
+
          _board.addPiece(_workingPiece);
          var _SBE = this.calculateSBE(_board);
          _board.clearFilledRows();
+
          if (_SBE[STATISTICS] > _bestSBE) {
             _bestSBE = _SBE[STATISTICS];
          }
+
          _workingPiece.row = 0;
+
          if (_board.moveAllowed(_workingPiece, RIGHT)) {
             _workingPiece.col++;
          } else {
             _col = 2 * COLS;
          }
       }
+
       _workingPiece.rotate('CW');
    }
+
    return _bestSBE;
-}
+};
 
 /**
  * Calculates a static board evaluation (SBE) which is basically a weighted sore based on a number
@@ -119,13 +138,16 @@ AI.prototype.calculateSBE = function (board) {
    if (board.evaluateGameOver()) {
       return -Infinity;
    }
+
    var _stats = AI.collectStatistics(board);
    var _SBE = 0;
+
    for (var _stat = 0; _stat < STATISTICS - 1; _stat++) {
       _SBE += _stats[_stat] * this.weights[_stat];
    }
+
    return _SBE;
-}
+};
 
 /**
  * Gathers the statistics (height, jaggedness, holes, filled rows) for a given board.
@@ -148,15 +170,19 @@ AI.collectStatistics = function (board) {
             _emptyCount++;
          }
       }
+
       _stats[HOLES] += _holeCount;
+
       if (_col > 0) {
          _stats[JAGGED] += Math.abs(_heights[_col] - _heights[_col - 1]);
       }
       _stats[HEIGHT] += _heights[_col];
    }
+
    // count filled rows
    for (var _row = ROWS - 1; _row >= 0; _row--) {
       var _filledRow = true;
+
       for (var _col = 0; _col < COLS; _col++) {
          // stop searching this row if its not totally filled
          if (board.matrix[_row][_col] == FREE) {
@@ -164,9 +190,11 @@ AI.collectStatistics = function (board) {
             _col = COLS + 1;
          }
       }
+
       if (_filledRow) {
          _stats[FILLED]++;;
       }
    }
+
    return _stats;
-}
+};

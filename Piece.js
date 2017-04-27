@@ -166,6 +166,7 @@ function Piece(id) {
             ];
             break;
     }
+
     this.rotation = 0;
     this.matrix = this.matrices[this.rotation];
     this.row = 0;
@@ -186,9 +187,10 @@ Piece.prototype.rotate = function(direction) {
             this.rotation = (this.rotation - 1 + this.matrices.length);
             break;
     }
+
     this.rotation %= this.matrices.length;
     this.matrix = this.matrices[this.rotation];
-}
+};
 
 /**
  * Duplicates this piece.
@@ -197,17 +199,20 @@ Piece.prototype.rotate = function(direction) {
 Piece.prototype.duplicate = function() {
     var _duplicate = new Piece(this.id);
     _duplicate.matrix = new Array(this.matrix.length);
+
     for (var _row = 0; _row < this.matrix.length; _row++) {
         _duplicate.matrix[_row] = new Array(this.cols);
+
         for (var _col = 0; _col < this.matrix.length; _col++) {
             _duplicate.matrix[_row][_col] = this.matrix[_row][_col];
         }
     }
+    
     _duplicate.rotation = this.rotation;
     _duplicate.row = this.row;
     _duplicate.col = this.col;
     return _duplicate;
-}
+};
 
 /**
  * Used for debugging. It prints out a piece's matrix representation.
@@ -220,6 +225,7 @@ Piece.prototype.print = function() {
     // for each element in the matrix, add it to a string buffer and print it
     for (var _row = 0; _row < this.matrix.length; _row++) {
         var _str = "[";
+
         for (var _col = 0; _col < this.matrix.length; _col++) {
             if (this.matrix[_row][_col] == FREE) {
                 _str = _str.concat("0");
@@ -230,10 +236,13 @@ Piece.prototype.print = function() {
                 _str = _str.concat(", ");
             }
         }
+
         _str = _str.concat("]");
+
         if (_row < this.matrix.length - 1) {
             _str = _str.concat(",");
         }
+        
         console.log(_str);
     }
-}
+};

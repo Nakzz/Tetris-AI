@@ -47,6 +47,7 @@ Board.prototype.moveAllowed = function(piece, direction) {
                 }
             }
             break;
+
         case LEFT:
             for (var _row = 0; _row < piece.matrix.length; _row++) {
                 for (var _col = 0; _col < piece.matrix.length; _col++) {
@@ -60,6 +61,7 @@ Board.prototype.moveAllowed = function(piece, direction) {
                 }
             }
             break;
+
         case RIGHT:
             for (var _row = 0; _row < piece.matrix.length; _row++) {
                 for (var _col = 0; _col < piece.matrix.length; _col++) {
@@ -74,8 +76,9 @@ Board.prototype.moveAllowed = function(piece, direction) {
             }
             break;
     }
+
     return true;
-}
+};
 
 /**
  * Determines if the given piece is allowed to make a particular rotation.
@@ -88,6 +91,7 @@ Board.prototype.rotationAllowed = function(piece, direction) {
     var _row = piece.row;
     var _duplicate = piece.duplicate();
     _duplicate.rotate(direction);
+
     for (var _row = 0; _row < _duplicate.matrix.length; _row++) {
         for (var _col = 0; _col < _duplicate.matrix.length; _col++) {
             if (_duplicate.matrix[_row][_col] != FREE) {
@@ -105,8 +109,9 @@ Board.prototype.rotationAllowed = function(piece, direction) {
             }
         }
     }
+
     return true;
-}
+};
 
 Board.prototype.evaluateGameOver = function() {
     for (var _row = 0; _row < COLS; _row++) {
@@ -114,8 +119,9 @@ Board.prototype.evaluateGameOver = function() {
             return true;
         }
     }
+    
     return false;
-}
+};
 
 /**
  * Creates a _duplicate of this board.
@@ -128,8 +134,9 @@ Board.prototype.duplicate = function() {
             newBoard.matrix[_row][_col] = this.matrix[_row][_col];
         }
     }
+
     return newBoard;
-}
+};
 
 /**
  * Add's a piece onto this board. Used when a piece is locked in (can't move down) or
@@ -144,7 +151,7 @@ Board.prototype.addPiece = function(piece) {
             }
         }
     }
-}
+};
 
 /**
  * Searches for a row to clear and then clears it by pulling down all the rows above it.
@@ -158,6 +165,7 @@ Board.prototype.clearFilledRows = function() {
             for (var _col = _row; _col > 0; _col--) {
                 this.matrix[_col] = this.matrix[_col - 1];
             }
+
             return BONUS;
         }
     }
@@ -178,7 +186,7 @@ Board.prototype.clearFilledRows = function() {
         }
     }
     return 0;
-}
+};
 
 /**
  * Print out a string representation of the board.
@@ -216,9 +224,10 @@ Board.prototype.print = function() {
                 _str = _str.concat(this.matrix[_row][_col]);
             }
         }
+
         console.log(_str);
     }
-}
+};
 
 Board.prototype.duplicateMatrix = function() {
     var _duplicate = new Array(this.rows);
@@ -228,5 +237,6 @@ Board.prototype.duplicateMatrix = function() {
             _duplicate[_row][_col] = this.matrix[_row][_col];
         }
     }
+
     return _duplicate;
-}
+};

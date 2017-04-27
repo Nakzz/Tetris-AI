@@ -23,6 +23,7 @@ var COLORS = ["#FFFFFF", "#000000", "#00FFFF", "#FFFF00", "#9900FF", "#00FF00", 
 function GameManager(minimal) {
     this.minimal = minimal;
     GameManager.setup(this);
+
     if (!this.minimal) {
         this.setupPage();
         this.update();
@@ -42,29 +43,35 @@ GameManager.prototype.setupPage = function() {
     this.blockWidth = this.canvas.width / (COLS);
     // set up buttons
     var _this = this;
+
     $('#reset-button').click(function() {
         GameManager.setup(_this);
         _this.draw();
     });
+
     $('#play-button').click(function() {
         _this.stopped = !_this.stopped;
         if (!_this.stopped) {
             _this.update();
         }
     });
+    
     $('#AI-button').click(function() {
         _this.usingAI = !_this.usingAI;
     });
+
     $("#guiding-button").click(function() {
         _this.guiding = !_this.guiding;
         _this.draw();
     });
+
     window.onkeydown = function(event) {
         // prevent space bar from scrolling down the page
         if (event.keyCode == 32) {
             event.preventDefault();
         }
     };
+
     // add event listener for controls of the game
     document.addEventListener('keydown', function(event) {
         // while the game is not paused and not over
@@ -92,7 +99,7 @@ GameManager.prototype.setupPage = function() {
             _this.draw();
         }
     });
-}
+};
 
 /**
  * This function sets up the game for a GameManager object. It sets fields, generates
@@ -112,10 +119,11 @@ GameManager.setup = function(_this) {
     _this.usingAI = true;
     _this.AI = new AI(_this.board, _this.workingPiece, _this.nextPiece);
     _this.previousUpdateTime = Date.now();
+
     window.requestAnimationFrame = function() {
         return (window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || window.oRequestAnimationFrame || window.msRequestAnimationFrame || function(callback) { window.setTimeout(callback, 1000 / 120); });
     }();
-}
+};
 
 /**
  * This function will be recursively called to continually update the board and to pull
@@ -129,9 +137,11 @@ GameManager.prototype.update = function() {
         if (this.usingAI && !this.AI.moved) {
             this.AIMove();
         }
+
         if (!this.usingAI || this.AI.moved) {
             this.movePiece(DOWN);
         }
+
         this.draw();
         this.evaluateGameOver();
         this.previousUpdateTime = _currentTime;
@@ -140,6 +150,7 @@ GameManager.prototype.update = function() {
         window.requestAnimationFrame(function() {
             this.update();
         }.bind(this));
+
         return true;
     } else if (!this.over && !this.stopped && this.minimal) {
         return true;
@@ -153,12 +164,12 @@ GameManager.prototype.update = function() {
  */
 GameManager.prototype.evaluateGameOver = function() {
     this.over = this.board.evaluateGameOver();
+
     if (!this.minimal && this.over) {
         console.log(this.over);
-
         GameManager.setup(this);
     }
-}
+};
 
 /**
  * Execute move given by the AI.
@@ -172,7 +183,7 @@ GameManager.prototype.AIMove = function() {
     this.workingPiece.col = this.move.col;
     this.workingPiece.rotation = this.move.rotation;
     this.workingPiece.rotate();
-}
+};
 
 /**
  * Update AI's knowledge of the working and next piece.
@@ -181,7 +192,7 @@ GameManager.prototype.updateAI = function() {
     this.AI.workingPiece = this.workingPiece.duplicate();
     this.AI.nextPiece = this.nextPiece.duplicate();
     this.AI.board = this.board;
-}
+};
 
 /**
  * Shuffle pieces if needed and then generate a new piece to be used.
@@ -189,12 +200,14 @@ GameManager.prototype.updateAI = function() {
  */
 GameManager.prototype.generatePiece = function() {
     this.pieceCount++;
+
     if (this.pieceIndex >= this.pieces.length) {
         this.shufflePieces();
         this.pieceIndex = 0;
     }
+
     return new Piece(this.pieces[this.pieceIndex++]);
-}
+};
 
 /**
  * Shuffle the array that contains the order of the pieces to use.
@@ -202,15 +215,17 @@ GameManager.prototype.generatePiece = function() {
 GameManager.prototype.shufflePieces = function() {
     var _ind = 0;
     this.pieces = new Array(PIECES).fill(0);
+
     while (_ind < PIECES) {
         var _randomInt = Math.floor(Math.random() * PIECES + 1);
+
         if (this.pieces.includes(_randomInt)) {
             continue;
         } else {
             this.pieces[_ind++] = _randomInt;
         }
     }
-}
+};
 
 /**
  * Determine if a move is allowed, and execute if allowed.
@@ -233,13 +248,14 @@ GameManager.prototype.movePiece = function(direction) {
         this.board.addPiece(this.workingPiece);
         this.workingPiece = this.nextPiece;
         this.nextPiece = this.generatePiece();
+
         if (this.dropping) {
             this.dropping = false;
         }
         this.AI.moved = false;
     }
     this.clearFilledRows();
-}
+};
 
 /**
  * Determine if a rotation is allowed (no pieces blocking it) and execute if allowed.
@@ -249,7 +265,7 @@ GameManager.prototype.rotatePiece = function(direction) {
     if (this.board.rotationAllowed(this.workingPiece, direction)) {
         this.workingPiece.rotate(direction);
     }
-}
+};
 
 /**
  * This clears all filled rows in the game.
@@ -258,7 +274,7 @@ GameManager.prototype.clearFilledRows = function() {
     if (this.board.clearFilledRows() > 0) {
         this.score += 100;
     }
-}
+};
 
 /**
  * Draws the board, working piece, next piece, and score to the screen.
@@ -267,6 +283,7 @@ GameManager.prototype.draw = function() {
     if (this.minimal) {
         return;
     }
+
     this.board.matrix = this.board.newMatrix;
     var _board = this.board.duplicate();
     var _piece = this.workingPiece;
@@ -275,6 +292,7 @@ GameManager.prototype.draw = function() {
     _gameContext.clearRect(0, 0, this.canvas.width, this.canvas.height);
     var _topMargin = -1;
     _gameContext.fillStyle = "#111111";
+
     // draw the gray guiding background
     for (var _col = 0; this.guiding && _col < _piece.matrix.length; _col++, _topMargin = -1) {
         for (var _row = 0; _row < _piece.matrix.length; _row++) {
@@ -282,6 +300,7 @@ GameManager.prototype.draw = function() {
                 _topMargin = _row;
             }
         }
+
         if (_topMargin != -1) {
             _gameContext.fillRect(this.blockWidth * (_piece.col + _col), this.blockHeight * (_piece.row + _topMargin - HIDDEN), this.blockWidth, 10 * this.canvas.height)
         }
@@ -295,6 +314,7 @@ GameManager.prototype.draw = function() {
             }
         }
     }
+
     var _nextPieceContext = this.nextPieceCanvas.getContext('2d');
     _nextPieceContext.clearRect(0, 0, this.nextPieceCanvas.width, this.nextPieceCanvas.height);
     // draw the next piece into its container
@@ -306,5 +326,6 @@ GameManager.prototype.draw = function() {
             }
         }
     }
+
     this.scoreContainer.innerHTML = this.score;
-}
+};
